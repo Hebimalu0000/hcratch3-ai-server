@@ -13,9 +13,9 @@ if not os.path.exists(LOG_FILE):
 
 st.title("AI API Server")
 
-if "api" in st.experimental_get_query_params():
+if "api" in st.query_params:
     st.write("### AI API Endpoint")
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params
     prompt = query_params.get("prompt", [""])[0]
 
     if prompt:
