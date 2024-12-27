@@ -1,21 +1,45 @@
-from github import Github
+import os
 import json
+import subprocess
 
-# GitHubのアクセストークンとリポジトリ情報
-GITHUB_TOKEN = "your_github_token"  # GitHubアクセストークンをここに入力
-REPO_NAME = "your_username/your_repo"  # GitHubリポジトリ名
+REPO_URL = "https://github.com/Hebimalu0000/hcratch3-ai-brain.git"  # 使用するGitHubリポジトリのURL
+LOCAL_REPO_DIR = "/tmp/hcratch3-ai-brain"  # ローカルにクローンするディレクトリ
+
+def clone_repo():
+    if not os.path.exists(LOCAL_REPO_DIR):
+        subprocess.run(["git", "clone", REPO_URL, LOCAL_REPO_DIR])
 
 def save_to_github(data: dict, file_path: str = "data.json"):
-    # GitHubリポジトリに接続
-    g = Github(GITHUB_TOKEN)
-    repo = g.get_repo(REPO_NAME)
+    # リポジトリをクローン
+    clone_repo()
 
-    # 既存ファイルを取得または新規作成
+    # 保存するファイルパス
+    file_full_path = os.path.join(LOCAL_REPO_DIR, file_path)
+
+    # クローンしたリポジトリのdata.jsonを更新
     try:
-        file = repo.get_contents(file_path)
-        current_data = json.loads(file.decoded_content.decode())
+        with open(file_full_path, "r") as f:
+            current_data = json.load(f)
         current_data.append(data)
-        repo.update_file(file.path, "Update conversation data", json.dumps(current_data, ensure_ascii=False, indent=4), file.sha)
-    except:
-        # 新規ファイル作成
-        repo.create_file(file_path, "Create conversation data", json.dumps([data], ensure_ascii=False, indent=4))
+    except FileNotFoundError:
+        current_data = [data]
+
+    # 更新したデータをファイルに書き込む
+    with open(file_full_path, "w") as f:
+        json.dump(current_data, f, ensure_ascii=False, indent=4)
+
+    # Git操作
+    os.chdir(LOCAL_REPO_DIR)
+
+    # Gitの設定（GitHub Actionsユーザー）
+    subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"])
+    subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"])
+
+    # 変更をステージング
+    subprocess.run(["git", "add", file_path])
+
+    # コミット
+    subprocess.run(["git", "commit", "-m", "Update conversation data"])
+
+    # プッシュ（公開リポジトリの場合、認証なしで可能）
+    subprocess.run(["git", "push", REPO_URL])
