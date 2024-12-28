@@ -1,0 +1,13 @@
+name: code-and-chat-api
+services:
+  - name: code-and-chat-service
+    type: web
+    description: Code generation and chat API using Hugging Face
+    instance_types:
+      - nano
+    routes:
+      - path: /
+        port: 8000
+    build:
+      type: docker
+      dockerfile: ./Dockerfile
