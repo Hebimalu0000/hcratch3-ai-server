@@ -7,7 +7,7 @@ services:
       - nano
     routes:
       - path: /
-        port: 8000
+        port: 5000
     build:
       type: docker
       dockerfile: ./Dockerfile
