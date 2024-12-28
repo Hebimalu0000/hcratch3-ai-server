@@ -1,4 +1,4 @@
-fastapi
-uvicorn[standard]
-transformers
-torch
+fastapi==0.95.2          # FastAPIのインストール
+uvicorn[standard]==0.23.1 # Uvicorn (ASGIサーバー) のインストール
+transformers==4.34.0     # Hugging Face Transformersライブラリ
+torch==2.1.0             # PyTorch (GPT-2やCodeGenなどのモデルを動かすために必要)
